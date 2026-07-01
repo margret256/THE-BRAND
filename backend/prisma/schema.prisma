@@ -3,19 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(CUSTOMER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orders    Order[]
+  id              String           @id @default(uuid())
+  email           String           @unique
+  password        String
+  name            String
+  phone           String?
+  role            Role             @default(CUSTOMER)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  orders          Order[]
   serviceRequests ServiceRequest[]
 }
 
@@ -31,26 +33,27 @@ model Category {
 }
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String      @id @default(uuid())
   name        String
   description String?
   price       Float
-  stock       Int      @default(0)
+  stock       Int         @default(0)
   imageUrl    String?
   categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime @default(now())
+  category    Category    @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime    @default(now())
   orderItems  OrderItem[]
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  userId     String
-  user       User        @relation(fields: [userId], references: [id])
-  status     OrderStatus @default(PENDING)
-  total      Float
-  createdAt  DateTime    @default(now())
-  items      OrderItem[]
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  status    OrderStatus @default(PENDING)
+  total     Float
+  createdAt DateTime    @default(now())
+  items     OrderItem[]
+  payment   Payment?
 }
 
 enum OrderStatus {
@@ -71,15 +74,45 @@ model OrderItem {
   price     Float
 }
 
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String        @unique
+  order           Order         @relation(fields: [orderId], references: [id])
+  amount          Float
+  currency        String        @default("UGX")
+  method          PaymentMethod
+  status          PaymentStatus @default(PENDING)
+  phone           String?
+  transactionId   String?
+  providerRef     String?
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum PaymentMethod {
+  MOBILE_MONEY
+  AIRTEL_MONEY
+  MASTERCARD
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
 model ServiceRequest {
-  id          String          @id @default(uuid())
+  id          String        @id @default(uuid())
   userId      String?
-  user        User?           @relation(fields: [userId], references: [id])
+  user        User?         @relation(fields: [userId], references: [id])
   serviceType ServiceType
   description String
   fileUrl     String?
-  status      RequestStatus   @default(PENDING)
-  createdAt   DateTime        @default(now())
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
 }
 
 enum ServiceType {
