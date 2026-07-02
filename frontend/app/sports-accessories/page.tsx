@@ -28,7 +28,7 @@ export default function SportsAccessoriesPage() {
       <section className="relative h-[60vh] flex items-center">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/images/accessories-hero.jpeg')" }}
+          style={{ backgroundImage: "url('/images/frontend/public/images/WhatsApp Image 2026-06-27 at 16.52.30 (1).jpeg')" }}
         />
         <div className="absolute inset-0 bg-black/70" />
         <div className="relative z-10 max-w-7xl mx-auto px-8">
